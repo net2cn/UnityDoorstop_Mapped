@@ -16,7 +16,11 @@ extern char_t buffer[4096];
 #endif
 
 static inline void init_logger() {
+#ifdef DETERMINISTIC_LOG
+    printf(buffer, TEXT("doorstop.log"));
+#else
     printf(buffer, TEXT("doorstop_%lx.log"), GetTickCount());
+#endif
     log_handle = CreateFile(buffer, GENERIC_WRITE, FILE_SHARE_READ, NULL,
                             CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 }
@@ -34,7 +38,8 @@ static inline void free_logger() { CloseHandle(log_handle); }
 #else
 #define LOG(message, ...)                                                      \
     {                                                                          \
-        size_t len = printf(buffer, TEXT(message) TEXT("\n") __VA_OPT__(, ) __VA_ARGS__); \
+        size_t len = printf(buffer, TEXT(message) TEXT("\n") __VA_OPT__(, )    \
+                                        __VA_ARGS__);                          \
         char *log_data = narrow(buffer);                                       \
         WriteFile(log_handle, log_data, len, NULL, NULL);                      \
         free(log_data);                                                        \
@@ -44,7 +49,7 @@ static inline void free_logger() { CloseHandle(log_handle); }
 #define ASSERT_F(test, message, ...)                                           \
     if (!(test)) {                                                             \
         char_t *buff = (char_t *)malloc(sizeof(char_t) * 1024);                \
-        printf(buff, TEXT(message) TEXT("\n"), __VA_ARGS__);                              \
+        printf(buff, TEXT(message) TEXT("\n"), __VA_ARGS__);                   \
         MessageBox(NULL, buff, TEXT("Doorstop: Fatal"), MB_OK | MB_ICONERROR); \
         free(buff);                                                            \
         ExitProcess(EXIT_FAILURE);                                             \
@@ -52,7 +57,7 @@ static inline void free_logger() { CloseHandle(log_handle); }
 
 #define ASSERT(test, message)                                                  \
     if (!(test)) {                                                             \
-        MessageBox(NULL, TEXT(message) TEXT("\n"), TEXT("Doorstop: Fatal"),               \
+        MessageBox(NULL, TEXT(message) TEXT("\n"), TEXT("Doorstop: Fatal"),    \
                    MB_OK | MB_ICONERROR);                                      \
         ExitProcess(EXIT_FAILURE);                                             \
     }

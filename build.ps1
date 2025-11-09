@@ -1,6 +1,7 @@
 param (
     [Parameter(Mandatory = $false)]
     [switch] $with_logging = $false,
+    [switch] $deterministic_log = $false,
     [ValidateSet("x86", "x64")]
     [string[]]
     $Arch = @("x86", "x64"),
@@ -55,6 +56,7 @@ if (!(Test-Path $XMAKE_DIR)) {
 $XMAKE_EXE = Join-Path $XMAKE_DIR "xmake.exe"
 foreach ($a in $Arch) {
     $verbose_opt = if ($with_logging) { "--include_logging=y" } else { "--include_logging=n" }
-    Invoke-Expression "& $XMAKE_EXE f -a $a $verbose_opt"
+    $deterministic_opt = if ($deterministic_log) { "--deterministic_log=y" } else { "--deterministic_log=n" }
+    Invoke-Expression "& $XMAKE_EXE f -a $a $verbose_opt $deterministic_opt"
     Invoke-Expression "& $XMAKE_EXE $($ScriptArgs -join " ")"
 }

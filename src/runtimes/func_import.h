@@ -1,4 +1,5 @@
 #include "../crt.h"
+#include "../mapper/mapper.h"
 
 #define DEFINE_CALLS
 
@@ -34,7 +35,8 @@ extern S(IMPORT_PREFIX) IMPORT_PREFIX;
 
 static void LOADER_FUNC_NAME(void *lib) {
 #define DEF_CALL(retType, name, ...)                                           \
-    IMPORT_PREFIX.name = (name##_t)dlsym(lib, STR(CAT(IMPORT_PREFIX, _, name)));
+    IMPORT_PREFIX.name = (name##_t)dlsym(                                      \
+        lib, get_mapped_player_name(STR(CAT(IMPORT_PREFIX, _, name))));
 #include IMPORT_LIB
 #undef DEF_CALL
 }

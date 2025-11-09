@@ -13,6 +13,11 @@ Doorstop is a tool to execute managed .NET assemblies inside Unity as early as p
 
 **This is a total rewrite of UnityDoorstop 3. See [list of breaking changes](CHANGES.md) for more information.**
 
+### FORK NOTE
+***This fork of Doorstop adds the ability to read import symbol names from `UnityPlayer.dll` using a mapper configuration file obtained with [this ghidra script](./ghidra_scripts/ExtractLoadIl2CppSymbolOffsets.py) on Windows. A mapper example can be found [here](./mapper.txt). The idea is to avoid hard-coding in symbol names and recompiling Doorstop to work with games that have had their `GameAssembly.dll` export symbol names changed (Especially with those who update the export names each time the game releases an update).***
+
+***Also, I've included an additional build option `-deterministic_log` to compile Doorstop to write its log to `doorstop.log` without the tick hash suffix. You may want to use this option with `-with_logging` to not having the trouble of deleting lots of logging files with different names.***
+
 ## Features
 
 * **Runs first**: Doorstop runs its code before Unity can do so

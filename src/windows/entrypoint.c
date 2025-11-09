@@ -140,10 +140,12 @@ void *WINAPI get_proc_address_detour(void *module, char *name) {
     // If the lpProcName pointer contains an ordinal rather than a string,
     // high-word value of the pointer is zero (see PR #66)
 #define REDIRECT_INIT(init_name, init_func, target, extra_init)                \
-    if (HIWORD(name) && lstrcmpA(name, init_name) == 0) {                      \
+    if (HIWORD(name) &&                                                        \
+        lstrcmpA(name, get_mapped_player_name(init_name)) == 0) {              \
         if (!initialized) {                                                    \
             initialized = TRUE;                                                \
-            LOG("Got %S at %p", init_name, module);                            \
+            LOG("Got %S (%S) at %p", get_mapped_player_name(init_name),        \
+                init_name, module);                                            \
             extra_init;                                                        \
             init_func(module);                                                 \
             LOG("Loaded all runtime functions\n")                              \
@@ -281,6 +283,9 @@ BOOL WINAPI DllEntry(HINSTANCE hInstDll, DWORD reasonForDllLoad,
 
     load_config();
     LOG("Config loaded");
+
+    load_mapper();
+    LOG("Mapper loaded");
 
     redirect_output_log(paths);
 
